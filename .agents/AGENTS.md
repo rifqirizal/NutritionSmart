@@ -8,7 +8,7 @@ Whenever you (the AI agent) are tasked with creating a new MVP feature or modify
 Do NOT skip this rule. The user expects automated tests to always cover the PRD cases.
 
 ## Rule 2: Update Progress Tracker
-Catat pembaruan di `ai/progress-tracker.md` **HANYA** untuk perubahan yang sudah berhasil di-*commit* ke Git. JANGAN menambahkan log untuk iterasi *prompt* atau kode yang belum di-*commit*. Ketika sebuah fitur atau perbaikan sudah selesai dan di-*commit*, tambahkan SATU baris ringkasan ke dalam *changelog*.
-Dalam setiap log pembaruan di changelog, **WAJIB** menyertakan nama branch yang sedang aktif dan pesan commit / hash terakhir.
+Catat pembaruan di `ai/progress-tracker.md` sebagai bagian dari pekerjaanmu **sebelum** user melakukan commit. Dengan begitu, perubahan fitur dan update tracker bisa di-commit bersamaan (cukup 1 kali commit).
+Dalam setiap log pembaruan di changelog, **WAJIB** menyertakan nama branch yang sedang aktif dan Rencana Pesan Commit (Commit Message). Tidak perlu menyertakan hash commit untuk menghindari *double commit*.
 Contoh format changelog:
-`* **[Tanggal]** - **[Nama Modul]** - [Deskripsi] - (Branch: \`main\`, Commit: \`abc1234 - pesan commit di sini\`)`
+`* **[Tanggal]** - **[Nama Modul]** - [Deskripsi] - (Branch: \`main\`, Commit Msg: \`feat: add food scan\`)`

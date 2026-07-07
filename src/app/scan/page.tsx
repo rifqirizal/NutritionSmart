@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Camera, Loader2, ArrowRight, Upload, Volume2, Square, User } from 'lucide-react';
+import { Camera, Loader2, ArrowRight, Upload, Languages, User } from 'lucide-react';
 import { useCameraPermission } from '@/hooks/useCameraPermission';
 import { scanFoodImage } from '@/services/scan';
 import { useProfileData } from '@/services/profile';
@@ -22,59 +22,51 @@ export default function ScanPage() {
   const { hasPermission, requestPermission } = useCameraPermission();
   const { data: profileRes, isLoading: profileLoading } = useProfileData();
   
-  // TTS State
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  // Translation State
+  const [targetLang, setTargetLang] = useState('id');
+  const [translatedAdvice, setTranslatedAdvice] = useState<string>('');
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const LANGUAGES = [
+    { code: 'id', name: '🇮🇩 Indonesia' },
+    { code: 'en', name: '🇬🇧 English' },
+    { code: 'ja', name: '🇯🇵 Japanese' },
+    { code: 'ko', name: '🇰🇷 Korean' },
+  ];
 
   useEffect(() => {
-    const loadVoices = () => {
-      if (typeof window === 'undefined') return;
-      const availableVoices = window.speechSynthesis.getVoices();
-      const idVoices = availableVoices.filter(v => v.lang.includes('id') || v.lang.includes('ID'));
-      setVoices(idVoices.length > 0 ? idVoices : availableVoices);
-    };
-    
-    loadVoices();
-    if (typeof window !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-    
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.speechSynthesis.cancel();
+    const translateAdvice = async () => {
+      if (!result?.advice) return;
+      if (targetLang === 'id') {
+        setTranslatedAdvice(result.advice);
+        return;
+      }
+      
+      setIsTranslating(true);
+      try {
+        const targetName = LANGUAGES.find(l => l.code === targetLang)?.name;
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: result.advice, targetLanguage: targetName }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setTranslatedAdvice(data.data);
+        } else {
+          toast.error(data.message || 'Failed to translate');
+          setTargetLang('id'); // Revert
+        }
+      } catch (err) {
+        toast.error('Translation error');
+        setTargetLang('id'); // Revert
+      } finally {
+        setIsTranslating(false);
       }
     };
-  }, []);
-
-  const toggleSpeech = () => {
-    if (typeof window === 'undefined') return;
     
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      return;
-    }
-
-    if (!result?.advice) return;
-
-    const cleanText = result.advice.replace(/\*\*/g, '').replace(/\*/g, '').replace(/-/g, '');
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    
-    if (voices.length > 0) {
-      // Find a sweet female voice
-      const selectedVoice = voices.find(v => v.name.toLowerCase().includes('gadis') || v.name.toLowerCase().includes('female') || v.name.includes('Google')) || voices[0];
-      utterance.voice = selectedVoice;
-    }
-    
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1; // Slightly higher pitch for a sweeter female voice
-    
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
+    translateAdvice();
+  }, [targetLang, result]);
 
 
   useEffect(() => {
@@ -342,24 +334,31 @@ export default function ScanPage() {
                   
                   {result.advice && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 mt-4 text-left">
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
                         <p className="text-sm font-semibold text-amber-600 dark:text-amber-500 uppercase tracking-wider">AI Recommendation</p>
                         <div className="flex items-center gap-2">
-                          <Button 
-                            variant="default" 
-                            size="sm" 
-                            className={`h-8 text-xs font-bold rounded-lg shadow-sm ${isSpeaking ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'}`}
-                            onClick={toggleSpeech}
-                          >
-                            {isSpeaking ? <Square size={14} className="mr-1 fill-current" /> : <Volume2 size={14} className="mr-1" />}
-                            {isSpeaking ? 'Stop' : 'Play'}
-                          </Button>
+                          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-lg border border-amber-200 dark:border-amber-900/50 shadow-sm px-2">
+                            <Languages size={14} className="text-amber-500 mr-2" />
+                            <select
+                              className="h-8 text-xs bg-transparent text-slate-700 dark:text-slate-200 outline-none focus:ring-0 max-w-[140px] md:max-w-[180px] cursor-pointer"
+                              value={targetLang}
+                              onChange={(e) => setTargetLang(e.target.value)}
+                              disabled={isTranslating}
+                            >
+                              {LANGUAGES.map((l) => (
+                                <option key={l.code} value={l.code}>
+                                  {l.name}
+                                </option>
+                              ))}
+                            </select>
+                            {isTranslating && <Loader2 size={12} className="animate-spin text-amber-500 ml-2" />}
+                          </div>
                         </div>
                       </div>
                       <div 
-                        className="text-amber-900 dark:text-amber-100 text-sm md:text-base leading-relaxed space-y-2 prose-p:mt-0 prose-p:mb-2 prose-strong:font-bold prose-strong:text-amber-700 dark:prose-strong:text-amber-300" 
+                        className={`text-amber-900 dark:text-amber-100 text-sm md:text-base leading-relaxed space-y-2 prose-p:mt-0 prose-p:mb-2 prose-strong:font-bold prose-strong:text-amber-700 dark:prose-strong:text-amber-300 transition-opacity duration-300 ${isTranslating ? 'opacity-50' : 'opacity-100'}`}
                         dangerouslySetInnerHTML={{ 
-                          __html: result.advice
+                          __html: translatedAdvice
                             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
                             .replace(/\n\n/g, '<br/><br/>')

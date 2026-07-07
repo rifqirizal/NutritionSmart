@@ -274,7 +274,9 @@ export default function DashboardPage() {
                         <MealImage url={meal.image_url} name={meal.meal_name} />
                         <div className="truncate">
                           <p className="font-semibold text-slate-900 dark:text-white truncate">{meal.meal_name}</p>
-                          <p className="text-xs text-slate-500">{new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-xs text-slate-500">
+                            {new Date(meal.created_at).toLocaleDateString([], { day: 'numeric', month: 'short' })} • {new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
