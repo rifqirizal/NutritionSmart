@@ -74,11 +74,11 @@ export function BottomNav() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden fixed bottom-4 left-0 right-0 px-4 pb-safe z-50 flex justify-center">
-        <div className="glass-panel bg-white/90 dark:bg-card/90 backdrop-blur-md border border-slate-100 dark:border-border rounded-full p-2 flex items-center gap-2 shadow-xl shadow-slate-200/50 dark:shadow-black/50">
+      <div className="md:hidden fixed bottom-4 left-0 right-0 px-4 pb-safe z-50 flex justify-center w-full">
+        <div className="glass-panel w-full max-w-sm bg-white/90 dark:bg-card/90 backdrop-blur-md border border-slate-100 dark:border-border rounded-full p-1.5 flex items-center justify-between shadow-xl shadow-slate-200/50 dark:shadow-black/50">
           <Link
             href="/dashboard"
-            className={`px-4 py-3 rounded-full flex items-center gap-2 transition-all ${pathname === '/dashboard'
+            className={`p-3 rounded-full flex items-center justify-center transition-all ${pathname === '/dashboard'
               ? 'bg-primary/10 font-semibold text-primary shadow-sm'
               : 'font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
@@ -87,14 +87,14 @@ export function BottomNav() {
           </Link>
           <Link
             href="/scan"
-            className="px-6 py-3 rounded-full bg-primary font-bold text-primary-foreground shadow-md shadow-primary/20 flex items-center gap-2 hover:bg-primary/90 transition-colors"
+            className="px-4 py-3 rounded-full bg-primary font-bold text-primary-foreground shadow-md shadow-primary/20 flex items-center justify-center gap-1.5 hover:bg-primary/90 transition-colors"
           >
             <ScanBarcode className="w-5 h-5" />
-            <span>Scan</span>
+            <span className="text-sm">Scan</span>
           </Link>
           <Link
             href="/report"
-            className={`px-4 py-3 rounded-full flex items-center gap-2 transition-all ${pathname === '/report'
+            className={`p-3 rounded-full flex items-center justify-center transition-all ${pathname === '/report'
               ? 'bg-primary/10 font-semibold text-primary shadow-sm'
               : 'font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
@@ -103,7 +103,7 @@ export function BottomNav() {
           </Link>
           <Link
             href="/profile"
-            className={`px-4 py-3 rounded-full flex items-center gap-2 transition-all ${pathname === '/profile'
+            className={`p-3 rounded-full flex items-center justify-center transition-all ${pathname === '/profile'
               ? 'bg-primary/10 font-semibold text-primary shadow-sm'
               : 'font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
@@ -112,7 +112,7 @@ export function BottomNav() {
           </Link>
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="px-4 py-3 rounded-full flex items-center gap-2 font-medium text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-all"
+            className="p-3 rounded-full flex items-center justify-center font-medium text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-all"
           >
             <LogOut className="w-5 h-5" />
           </button>
