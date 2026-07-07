@@ -12,8 +12,10 @@ import { useProfileData } from '@/services/profile';
 import { BottomNav } from '@/components/BottomNav';
 import { ScanResult } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ScanPage() {
+  const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -151,6 +153,7 @@ export default function ScanPage() {
       } else {
         setResult(data.data);
         toast.success('Food analyzed successfully!');
+        queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
       }
     } catch (err) {
       toast.error('An error occurred during scanning. Make sure GEMINI_API_KEY is configured.');

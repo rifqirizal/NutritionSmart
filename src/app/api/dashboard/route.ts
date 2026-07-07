@@ -34,7 +34,7 @@ export async function GET() {
         where: { user_id: session.userId },
         include: { meal_nutrition: true },
         orderBy: { created_at: 'desc' },
-        take: 5,
+        take: 6,
       }),
     ]);
 

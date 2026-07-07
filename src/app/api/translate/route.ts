@@ -19,7 +19,12 @@ export async function POST(request: Request) {
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: prompt,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ],
     });
 
     return NextResponse.json({ success: true, data: response.text });
