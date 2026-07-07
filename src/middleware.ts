@@ -15,6 +15,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (request.nextUrl.pathname === '/') {
+    if (token) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    return NextResponse.next();
+  }
+
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
@@ -23,5 +30,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard', '/scan', '/profile', '/report', '/login', '/register'],
+  matcher: ['/', '/dashboard', '/scan', '/profile', '/report', '/login', '/register'],
 };
