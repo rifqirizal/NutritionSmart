@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  name               String
+  email              String              @unique
+  password_hash      String
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+  profile            Profile?
+  meals              Meal[]
+  ai_recommendations AiRecommendation[]
+  daily_summaries    DailySummary[]
+
+  @@map("users")
+}
+
+model Profile {
+  id             String   @id @default(uuid())
+  user_id        String   @unique
+  birth_date     DateTime
+  gender         String
+  height_cm      Int
+  current_weight Float
+  target_weight  Float
+  goal           String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Meal {
+  id             String         @id @default(uuid())
+  user_id        String
+  image_url      String
+  meal_name      String
+  created_at     DateTime       @default(now())
+  user           User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  meal_nutrition MealNutrition?
+
+  @@map("meals")
+}
+
+model MealNutrition {
+  id               String  @id @default(uuid())
+  meal_id          String  @unique
+  calories         Float
+  protein          Float
+  carbs            Float
+  fat              Float
+  confidence_score Float
+  advice           String? @db.Text
+  meal             Meal    @relation(fields: [meal_id], references: [id], onDelete: Cascade)
+
+  @@map("meal_nutritions")
+}
+
+model AiRecommendation {
+  id                  String   @id @default(uuid())
+  user_id             String
+  recommendation_text String
+  generated_at        DateTime @default(now())
+  user                User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("ai_recommendations")
+}
+
+model DailySummary {
+  id             String   @id @default(uuid())
+  user_id        String
+  date           DateTime
+  total_calories Float
+  total_protein  Float
+  total_carbs    Float
+  total_fat      Float
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+  @@map("daily_summaries")
+}

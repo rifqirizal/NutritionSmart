@@ -1,0 +1,53 @@
+====================================================================
+PRESENTATION SCRIPT & DEVELOPMENT JOURNEY: SMART NUTRITION TRACKER
+====================================================================
+
+1. PENJELASAN SINGKAT PROJECT
+Smart Nutrition Tracker adalah aplikasi web cerdas (berbasis Next.js & AI) yang membantu pengguna melacak asupan kalori dan makronutrisi harian mereka dengan sangat mudah. 
+
+Fitur utamanya adalah "AI Food Scanner" yang ditenagai oleh Google Gemini Vision. Pengguna cukup mengunggah atau memotret makanan, dan AI akan secara otomatis mengenali nama makanan, menghitung kalori, protein, karbohidrat, serta lemaknya. Lebih dari itu, AI juga memberikan saran (advice) spesifik yang dibacakan otomatis dengan suara (TTS), yang disesuaikan secara personal dengan profil dan target (goal) berat badan pengguna. Aplikasi ini juga memiliki Dashboard harian dan halaman Report untuk melihat riwayat makan.
+
+--------------------------------------------------------------------
+
+2. BAGAIMANA SAYA MEMBANGUN APLIKASI INI DENGAN AI (Development Journey)
+Aplikasi ini dikembangkan menggunakan pendekatan "Agentic AI Workflow", di mana saya berkolaborasi dengan AI Assistant. Berikut adalah tahapan sistematis yang saya lakukan:
+
+A. Fase 1: Setup Knowledge Base (Folder 'ai/')
+Saya tidak memulainya dengan menyuruh AI asal menulis kode. Pertama, saya membuat folder 'ai/' di dalam root project. Di dalam folder ini, saya menuliskan Context dan PRD (Product Requirements Document), seperti instruksi utama, tech stack yang digunakan, hingga kontrak API. Folder ini berfungsi sebagai "otak utama" atau pedoman agar AI memahami bisnis logik dan tujuan aplikasi secara keseluruhan.
+
+B. Fase 2: Prompting Berbasis Konteks
+Setelah folder 'ai/' siap, langkah selanjutnya adalah prompting. Saya memerintahkan AI untuk membaca seluruh isi folder 'ai/' tersebut. Dengan konteks yang sudah utuh, AI kemudian merancang fondasi aplikasi end-to-end dengan sangat akurat (mulai dari setup Next.js, Prisma schema, hingga API routes Gemini).
+
+C. Fase 3: Customizing Behavior (Folder '.agents')
+Untuk menjaga konsistensi pengerjaan dalam jangka panjang, saya memanfaatkan fitur '.agents' (terutama membuat rule di file AGENTS.md). Saya menetapkan aturan (Rules) agar setiap kali AI membuat atau mengubah fitur, AI diwajibkan untuk:
+- Mengupdate dokumen PRD di folder 'ai/'.
+- Selalu membuat atau memperbarui Unit Testing (menggunakan Vitest).
+Hal ini mencegah terjadinya regresi bug di masa depan.
+
+D. Fase 4: Styling & Refinement
+Setelah sistem fungsional terbentuk, saya memberikan arahan lanjutan (iterasi) untuk menyempurnakan aplikasi. Saya mengarahkan AI untuk memoles UI/UX (Tailwind styling), membatasi list di dashboard, dan menambahkan fitur native browser seperti Web Speech API untuk membacakan hasil analisis makanan (tanpa menggunakan library pihak ketiga tambahan).
+
+E. Fase 5: Unit Testing & End-to-End Checking
+Terakhir, saya melakukan End-to-End testing manual untuk memastikan seluruh alur berjalan sesuai behavior yang diharapkan. Di belakang layar, unit tests yang sudah digenerate AI memastikan bahwa logika perhitungan gizi dan integrasi database berjalan tanpa celah.
+
+--------------------------------------------------------------------
+
+3. TECH STACK & ARSITEKTUR SISTEM
+
+- Model AI: Google Gemini (Gemini 2.5 Flash)
+  Dipilih secara khusus karena kemampuannya dalam "Multimodal Vision" (mampu "melihat" dan menganalisis gambar makanan secara detail) sekaligus memproses bahasa alami (merangkai saran/advice yang dipersonalisasi berdasarkan goal dan metrik pengguna).
+
+- Database & ORM: 
+  Sistem ini menggunakan PostgreSQL (melalui cloud provider Supabase) sebagai relasional database utama. Interaksi ke database tidak menggunakan SQL manual, melainkan menggunakan Prisma ORM. Prisma menjamin "End-to-End Type Safety" sehingga mempercepat development dan meminimalisir error tipe data.
+
+- Struktur Tabel (Database Schema):
+  1. users: Menyimpan data autentikasi (email, password yang di-hash, nama).
+  2. profiles: Relasi 1-to-1 dengan users. Menyimpan metrik fisik pengguna (tinggi, berat saat ini, berat target, umur, gender, dan goal/tujuan spesifik pengguna).
+  3. meals: Menyimpan entri/log makanan harian (nama makanan, foto/URL gambar, waktu).
+  4. meal_nutritions: Relasi 1-to-1 dengan meals. Menyimpan rincian nutrisi hasil tebakan AI (kalori, protein, karbohidrat, lemak, serta teks advice/saran).
+  5. daily_summaries: Tabel agregasi harian. Menyimpan total akumulasi kalori dan makro yang dimakan dalam 1 hari. Data ini yang dirender di bar progress Dashboard dan akan selalu memulai rekapan baru pada keesokan harinya.
+
+====================================================================
+Kesimpulan:
+Project ini bukan sekadar hasil dari "sekali perintah langsung jadi", melainkan hasil dari arsitektur instruksi yang terstruktur (menggunakan PRD dan Rules), iterasi, dan penyempurnaan desain yang dikolaborasikan bersama Agentic AI.
+====================================================================

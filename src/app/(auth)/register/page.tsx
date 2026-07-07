@@ -1,0 +1,168 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registerSchema, RegisterInput } from '@/validators/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import Link from 'next/link';
+import Image from 'next/image';
+import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { Apple, ArrowRight } from 'lucide-react';
+import { useRegister } from '@/services/auth';
+
+export default function RegisterPage() {
+  const { mutateAsync: registerMutation, isPending: loading } = useRegister();
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: '', email: '', password: '' },
+  });
+
+  const onSubmit = async (data: RegisterInput) => {
+    try {
+      const result = await registerMutation(data);
+      if (!result.success) {
+        toast.error(result.message || 'Registration failed');
+      } else {
+        toast.success('Registration successful! Please login.');
+        window.location.href = '/login';
+      }
+    } catch (err) {
+      toast.error('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex flex-col md:flex-row-reverse bg-background">
+      {/* Right side - Image (Reversed for register page) */}
+      <div className="hidden md:flex md:w-1/2 relative bg-slate-900 overflow-hidden">
+        <Image 
+          src="/assets/images/auth-bg.jpg" 
+          alt="Healthy food" 
+          fill 
+          className="object-cover opacity-70"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+        <div className="absolute bottom-12 left-12 right-12 z-10 text-white">
+          <div className="flex items-center gap-2 font-bold text-2xl tracking-tight mb-4">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+              <Apple size={24} className="text-white" />
+            </div>
+            NutriSmart
+          </div>
+          <h2 className="text-4xl font-bold mb-4 leading-tight">Empower your body with knowledge.</h2>
+          <p className="text-slate-300 text-lg">Sign up today and get detailed insights into everything you eat, instantly.</p>
+        </div>
+      </div>
+
+      {/* Left side - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-md space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, type: 'spring', bounce: 0.4 }}
+          >
+            <div className="md:hidden flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900 dark:text-white mb-8 justify-center">
+              <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-md">
+                <Apple size={20} className="text-white" />
+              </div>
+              NutriSmart
+            </div>
+
+            <div className="text-center md:text-left mb-6">
+              <h1 className="text-3xl font-extrabold tracking-tight mb-2">Create Account</h1>
+              <p className="text-muted-foreground">Fill in your details to get started.</p>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-semibold">Full Name</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="John Doe" 
+                          {...field} 
+                          value={field.value ?? ""}
+                          className="h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-primary" 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-semibold">Email address</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="you@example.com" 
+                          {...field} 
+                          value={field.value ?? ""}
+                          className="h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-primary" 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-semibold">Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          {...field} 
+                          value={field.value ?? ""}
+                          className="h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-primary" 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 rounded-xl font-bold text-base mt-6 flex items-center justify-center gap-2 group" 
+                  disabled={loading}
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}
+                  {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="mt-8 text-center text-sm">
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link href="/login" className="font-bold text-primary hover:underline">
+                Sign in
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
