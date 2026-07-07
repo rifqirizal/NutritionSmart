@@ -2,17 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, ScanBarcode, FileText, User, LogOut } from 'lucide-react';
+import { Home, ScanBarcode, FileText, User, LogOut, AlertTriangle } from 'lucide-react';
 import { useLogout } from '@/services/auth';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { mutateAsync: logoutMutation } = useLogout();
+  const { mutateAsync: logoutMutation, isPending } = useLogout();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logoutMutation();
+      setShowLogoutModal(false);
       router.push('/login');
     } catch (error) {
       console.error('Failed to logout:', error);
@@ -60,7 +64,7 @@ export function BottomNav() {
           </div>
           
           <button 
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:text-slate-400 dark:hover:text-red-400 dark:hover:bg-red-950/30 rounded-full transition-colors ml-2"
             title="Log out"
           >
@@ -106,8 +110,64 @@ export function BottomNav() {
           >
             <User className="w-5 h-5" />
           </Link>
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="px-4 py-3 rounded-full flex items-center gap-2 font-medium text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLogoutModal(false)}
+              className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm overflow-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6"
+            >
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-500 dark:text-red-400" />
+              </div>
+              
+              <h3 className="text-xl font-bold text-center text-slate-900 dark:text-white mb-2">
+                Log Out?
+              </h3>
+              <p className="text-center text-slate-500 dark:text-slate-400 mb-6">
+                Are you sure you want to log out of your NutriSmart account? You will need to log in again to access your dashboard.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  disabled={isPending}
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  disabled={isPending}
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center disabled:opacity-70"
+                >
+                  {isPending ? 'Logging out...' : 'Yes, Log Out'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useDashboardData } from '@/services/dashboard';
 import { useProfileData } from '@/services/profile';
@@ -12,6 +12,31 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useLogout } from '@/services/auth';
 import { useRouter } from 'next/navigation';
+
+const MealImage = ({ url, name }: { url: string | null, name: string }) => {
+  const [error, setError] = useState(false);
+  
+  if (!url || error) {
+    return (
+      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        <Utensils className="text-primary w-6 h-6" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-slate-100 dark:bg-slate-800">
+      <Image
+        src={url}
+        alt={name}
+        fill
+        sizes="48px"
+        className="object-cover"
+        onError={() => setError(true)}
+      />
+    </div>
+  );
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -145,11 +170,7 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Today's Overview</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">Here's your nutritional summary for today</p>
           </div>
-          <div className="flex items-center gap-3 md:hidden">
-            <Button variant="outline" size="icon" onClick={handleLogout} className="rounded-full w-10 h-10 border-slate-200 dark:border-border text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30">
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
+
         </motion.header>
 
         {profileRes && profileRes.success && !profileRes.data && (
@@ -250,21 +271,7 @@ export default function DashboardPage() {
                   {recentMeals.slice(0, 5).map((meal: any) => (
                     <div key={meal.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-border/50 bg-slate-50 dark:bg-slate-900/50">
                       <div className="flex items-center gap-3 overflow-hidden">
-                        {meal.image_url ? (
-                          <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative bg-slate-100 dark:bg-slate-800">
-                            <Image
-                              src={meal.image_url}
-                              alt={meal.meal_name}
-                              fill
-                              sizes="48px"
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            <Utensils className="text-primary w-6 h-6" />
-                          </div>
-                        )}
+                        <MealImage url={meal.image_url} name={meal.meal_name} />
                         <div className="truncate">
                           <p className="font-semibold text-slate-900 dark:text-white truncate">{meal.meal_name}</p>
                           <p className="text-xs text-slate-500">{new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
