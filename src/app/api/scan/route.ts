@@ -15,17 +15,13 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get('image') as File;
-    const compressedFile = (formData.get('imageCompressed') as File) || file; // Fallback to original
 
     if (!file) {
       return NextResponse.json({ success: false, message: 'No image uploaded' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes); // For Gemini AI
-
-    const compressedBytes = await compressedFile.arrayBuffer();
-    const compressedBuffer = Buffer.from(compressedBytes); // For public/uploads
+    const buffer = Buffer.from(bytes); // For Gemini AI & Storage
 
     // Save image to public/uploads
     const uploadsDir = join(process.cwd(), 'public', 'uploads');
@@ -45,9 +41,9 @@ export async function POST(request: Request) {
       }
     } catch (_) { }
 
-    const filename = `${crypto.randomUUID()}-${compressedFile.name}`;
+    const filename = `${crypto.randomUUID()}-${file.name}`;
     const filepath = join(uploadsDir, filename);
-    await writeFile(filepath, compressedBuffer);
+    await writeFile(filepath, buffer);
     const imageUrl = `/uploads/${filename}`;
 
     // Get user profile to customize advice

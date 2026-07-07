@@ -139,14 +139,20 @@ export default function ScanPage() {
 
     try {
       const formData = new FormData();
-      formData.append('image', file); // Original for AI
       
-      try {
-        const compressed = await compressImage(file);
-        formData.append('imageCompressed', compressed); // Compressed for Storage
-      } catch (err) {
-        formData.append('imageCompressed', file); // Fallback to original
+      // Jika file lebih besar dari 3MB, lakukan kompresi.
+      // Jika di bawah 3MB, kirim file asli agar kualitas tetap maksimal
+      // dan tetap aman dari batas 4.5MB Vercel.
+      let fileToSend = file;
+      if (file.size > 3 * 1024 * 1024) {
+        try {
+          fileToSend = await compressImage(file);
+        } catch (err) {
+          console.error("Gagal mengkompresi gambar:", err);
+        }
       }
+      
+      formData.append('image', fileToSend);
 
       const data = await scanFoodImage(formData);
 
