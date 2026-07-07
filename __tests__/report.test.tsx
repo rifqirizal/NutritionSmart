@@ -14,8 +14,8 @@ vi.mock('@tanstack/react-query', () => ({
 vi.mock('recharts', async () => {
   const OriginalModule = await vi.importActual('recharts')
   return {
-    ...OriginalModule as any,
-    ResponsiveContainer: ({ children }: any) => <div style={{ width: '100%', height: 300 }}>{children}</div>
+    ...(OriginalModule as Record<string, unknown>),
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div style={{ width: '100%', height: 300 }}>{children}</div>
   }
 })
 

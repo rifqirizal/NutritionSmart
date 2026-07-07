@@ -51,3 +51,10 @@ When generating code use:
 process.env.GEMINI_API_KEY
 
 Never generate actual secret values.
+
+## API & Payload Security
+
+Since images are sent as Base64 strings to the backend:
+* Next.js API Routes must handle large payloads gracefully but enforce limits (e.g., standard Vercel 4.5MB limit).
+* Client-side compression (WebP) MUST happen before sending the request to avoid memory limits and payload rejection on Vercel serverless functions.
+* Never trust client payload size blindly; always ensure the backend does not crash on malformed Base64 strings.

@@ -74,10 +74,11 @@ Included:
 
 * Authentication
 * Profile Setup
-* Food Scan (Responsive UI: Mobile Camera, Desktop File Upload)
-* Nutrition Analysis
-* Dashboard
-* Weekly/Dynamic Report (Filter by 7, 14, 30 days)
+* Food Scan (Responsive UI: Mobile Camera, Desktop File Upload, Client-side Image Compression)
+* Nutrition Analysis (Gemini 2.5 Flash)
+* AI Advice Translation (Multi-language Support)
+* Dashboard (Real-time update via React Query)
+* Weekly/Dynamic Report (Filter by 7, 14, 30 days) with AI Recommendations Pagination (max 4 per page)
 * Monthly Report
 
 Excluded:
@@ -102,11 +103,11 @@ Excluded:
 
 ## Data Retention & Storage Policy
 
-Untuk menjaga efisiensi ruang penyimpanan (*storage*) dan kecepatan *database*:
-* **Gambar (Images):** File foto makanan yang diunggah akan disimpan di *Cloud Storage* (Supabase Storage).
-* **Cron Cleanup 14 Hari:** File gambar di *Cloud Storage* otomatis **dihapus** jika umurnya sudah melewati 14 hari melalui mekanisme *Cron Job*.
-* **Hasil Analisis (Database):** Hasil perhitungan nutrisi (Kalori, Protein, dll) yang diekstrak oleh AI **TIDAK** akan dihapus dan akan disimpan secara permanen di *Database* (PostgreSQL).
-* **Reporting Module:** Modul Laporan (Weekly/Monthly Report) **TIDAK** memuat ulang atau merender gambar (*images*) untuk menghemat *bandwidth* dan menghindari *broken link* dari gambar yang sudah dihapus oleh *Cron*. Laporan sepenuhnya berbasis data analitik teks/angka.
+Untuk menjaga efisiensi pengembangan (fase MVP) dan mengatasi limitasi *Read-Only File System* (EROFS) pada *serverless* Vercel:
+* **Gambar (Images):** File foto makanan yang diunggah akan dikompresi di sisi klien (*client-side compression*) menggunakan `canvas` ke format `webp` hingga berukuran sangat kecil (< 50KB).
+* **Penyimpanan:** Gambar yang sudah dikompresi akan dikonversi menjadi *Base64 string* dan langsung disimpan ke dalam kolom `image_url` berjenis `TEXT` di *Database* (PostgreSQL). Tidak menggunakan penyimpanan file lokal (`public/upload`) maupun *Cloud Storage* eksternal.
+* **Cron Cleanup:** Tidak diperlukan Cron Job lagi karena gambar tidak berbentuk file fisik yang membebani folder server. 
+* **Reporting Module:** Modul Laporan (Weekly/Monthly Report) **TIDAK** memuat ulang atau merender gambar (*images*) untuk menghemat *bandwidth* dan mempercepat *rendering*. Laporan sepenuhnya berbasis data analitik teks/angka.
 
 ---
 

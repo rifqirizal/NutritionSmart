@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 const MealImage = ({ url, name }: { url: string | null, name: string }) => {
   const [error, setError] = useState(false);
-  
+
   if (!url || error) {
     return (
       <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -71,7 +71,7 @@ export default function DashboardPage() {
     let feedback = 'Start logging your meals for today!';
     let percentage = 0;
 
-    let tCalories = todaySum?.total_calories || 0;
+    const tCalories = todaySum?.total_calories || 0;
 
     if (profile) {
       const birthDate = new Date(profile.birth_date);
@@ -80,7 +80,7 @@ export default function DashboardPage() {
       let bmr = (10 * profile.current_weight) + (6.25 * profile.height_cm) - (5 * age);
       bmr = profile.gender === 'male' ? bmr + 5 : bmr - 161;
 
-      let tdee = bmr * 1.375;
+      const tdee = bmr * 1.375;
 
       if (profile.goal.toLowerCase().includes('turun') || profile.target_weight < profile.current_weight) {
         target = Math.round(tdee - 500);

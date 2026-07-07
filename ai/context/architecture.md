@@ -2,11 +2,12 @@
 
 ## Frontend
 
-* Next.js 15
+* Next.js 15 (App Router)
 * TypeScript
 * Tailwind CSS
 * Shadcn UI
 * Recharts
+* React Query (@tanstack/react-query)
 * PWA
 
 ---
@@ -32,8 +33,9 @@ Gemini Vision
 Responsibilities:
 
 * Food Recognition
-* Nutrition Estimation
-* Recommendation Generation
+* Nutrition Estimation (Calories, Macros)
+* Recommendation Generation & Advice
+* Multi-language Translation (ID, EN)
 
 ---
 
@@ -46,7 +48,7 @@ Database:
 Neon PostgreSQL / Supabase
 
 Storage:
-Cloud Storage
+PostgreSQL (Images are compressed client-side via canvas to WebP and stored natively as Base64 strings to bypass Vercel EROFS read-only file system limitations). No external Cloud Storage or local `/public/upload` is used.
 
 ---
 

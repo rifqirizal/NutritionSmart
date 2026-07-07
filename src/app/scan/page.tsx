@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Camera, Loader2, ArrowRight, Upload, Languages, User } from 'lucide-react';
+import { Camera, Loader2, ArrowRight, Upload, Languages } from 'lucide-react';
 import { useCameraPermission } from '@/hooks/useCameraPermission';
 import { scanFoodImage } from '@/services/scan';
 import { useProfileData } from '@/services/profile';
@@ -21,7 +21,7 @@ export default function ScanPage() {
   const router = useRouter();
   const { hasPermission, requestPermission } = useCameraPermission();
   const { data: profileRes, isLoading: profileLoading } = useProfileData();
-  
+
   // Translation State
   const [targetLang, setTargetLang] = useState('id');
   const [translatedAdvice, setTranslatedAdvice] = useState<string>('');
@@ -30,8 +30,6 @@ export default function ScanPage() {
   const LANGUAGES = [
     { code: 'id', name: '🇮🇩 Indonesia' },
     { code: 'en', name: '🇬🇧 English' },
-    { code: 'ja', name: '🇯🇵 Japanese' },
-    { code: 'ko', name: '🇰🇷 Korean' },
   ];
 
   useEffect(() => {
@@ -41,7 +39,7 @@ export default function ScanPage() {
         setTranslatedAdvice(result.advice);
         return;
       }
-      
+
       setIsTranslating(true);
       try {
         const targetName = LANGUAGES.find(l => l.code === targetLang)?.name;
@@ -64,7 +62,7 @@ export default function ScanPage() {
         setIsTranslating(false);
       }
     };
-    
+
     translateAdvice();
   }, [targetLang, result]);
 
@@ -87,7 +85,7 @@ export default function ScanPage() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          
+
           const max = 800;
           if (width > height && width > max) {
             height *= max / width;
@@ -96,12 +94,12 @@ export default function ScanPage() {
             width *= max / height;
             height = max;
           }
-          
+
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
-          
+
           canvas.toBlob((blob) => {
             if (!blob) return reject(new Error('Canvas is empty'));
             const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
@@ -131,7 +129,7 @@ export default function ScanPage() {
 
     try {
       const formData = new FormData();
-      
+
       // Jika file lebih besar dari 3MB, lakukan kompresi.
       // Jika di bawah 3MB, kirim file asli agar kualitas tetap maksimal
       // dan tetap aman dari batas 4.5MB Vercel.
@@ -143,7 +141,7 @@ export default function ScanPage() {
           console.error("Gagal mengkompresi gambar:", err);
         }
       }
-      
+
       formData.append('image', fileToSend);
 
       const data = await scanFoodImage(formData);
@@ -331,7 +329,7 @@ export default function ScanPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   {result.advice && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 mt-4 text-left">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
@@ -355,9 +353,9 @@ export default function ScanPage() {
                           </div>
                         </div>
                       </div>
-                      <div 
+                      <div
                         className={`text-amber-900 dark:text-amber-100 text-sm md:text-base leading-relaxed space-y-2 prose-p:mt-0 prose-p:mb-2 prose-strong:font-bold prose-strong:text-amber-700 dark:prose-strong:text-amber-300 transition-opacity duration-300 ${isTranslating ? 'opacity-50' : 'opacity-100'}`}
-                        dangerouslySetInnerHTML={{ 
+                        dangerouslySetInnerHTML={{
                           __html: translatedAdvice
                             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -365,7 +363,7 @@ export default function ScanPage() {
                             .replace(/\n- /g, '<br/>• ')
                             .replace(/\n\* /g, '<br/>• ')
                             .replace(/\n/g, '<br/>')
-                        }} 
+                        }}
                       />
                     </div>
                   )}

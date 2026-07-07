@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -8,13 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { BottomNav } from '@/components/BottomNav';
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
-import { TrendingUp, Flame, Beef, Wheat, Droplet, Lightbulb, Clock } from 'lucide-react';
+import { TrendingUp, Flame, Beef, Wheat, Droplet, Lightbulb, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
 import { ChartData, DailySummary } from '@/types';
 
 export default function ReportPage() {
   const [days, setDays] = useState(7);
+  const [recPage, setRecPage] = useState(1);
+  const itemsPerPage = 4;
+
+  useEffect(() => {
+    setRecPage(1);
+  }, [days]);
 
   const { data: res, isLoading: loading } = useQuery({
     queryKey: ['weeklyReport', days],
@@ -57,6 +63,9 @@ export default function ReportPage() {
     }
     return [];
   }, [res]);
+
+  const totalRecPages = Math.ceil(meals.length / itemsPerPage);
+  const currentRecs = meals.slice((recPage - 1) * itemsPerPage, recPage * itemsPerPage);
 
   if (loading)
     return (
@@ -218,7 +227,7 @@ export default function ReportPage() {
               <Lightbulb className="text-primary" size={24} /> Meal AI Recommendations
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {meals.map((meal: any) => (
+              {currentRecs.map((meal: any) => (
                 <Card key={meal.id} className="rounded-xl overflow-hidden border-0 ring-1 ring-slate-100 dark:ring-white/5 shadow-md">
                   <div className="p-4 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-1">
@@ -243,6 +252,29 @@ export default function ReportPage() {
                 </Card>
               ))}
             </div>
+            
+            {/* Pagination Controls */}
+            {totalRecPages > 1 && (
+              <div className="flex items-center justify-between mt-6 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-100 dark:border-white/5">
+                <button
+                  onClick={() => setRecPage(p => Math.max(1, p - 1))}
+                  disabled={recPage === 1}
+                  className="p-2 flex items-center gap-1 text-sm font-medium text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <ChevronLeft size={16} /> Back
+                </button>
+                <div className="text-sm font-medium text-slate-500">
+                  Page {recPage} of {totalRecPages}
+                </div>
+                <button
+                  onClick={() => setRecPage(p => Math.min(totalRecPages, p + 1))}
+                  disabled={recPage === totalRecPages}
+                  className="p-2 flex items-center gap-1 text-sm font-medium text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  Next <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </motion.div>
