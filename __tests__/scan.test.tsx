@@ -13,6 +13,8 @@ vi.mock('@/hooks/useCameraPermission', () => ({
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: () => ({ data: { success: true, data: { current_weight: 70, target_weight: 65, goal: 'Lose Weight' } }, isLoading: false }),
+  useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
 }))
 
 describe('Food Scan Module', () => {

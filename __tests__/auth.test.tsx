@@ -12,10 +12,16 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '',
 }))
 
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: () => ({ data: null, isLoading: false }),
+  useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+}))
+
 describe('Authentication Module', () => {
   it('renders Login page correctly', () => {
     render(<LoginPage />)
-    expect(screen.getByText(/Welcome back/i)).toBeInTheDocument()
+    expect(screen.getByText(/Sign in to your account/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Log In/i })).toBeInTheDocument()

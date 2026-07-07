@@ -224,24 +224,24 @@ export default function ReportPage() {
         {meals.length > 0 && (
           <div className="space-y-4 mt-8">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Lightbulb className="text-primary" size={24} /> Meal AI Recommendations
+              <Lightbulb className="text-primary" /> Meal AI Recommendations
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {currentRecs.map((meal: any) => (
-                <Card key={meal.id} className="rounded-xl overflow-hidden border-0 ring-1 ring-slate-100 dark:ring-white/5 shadow-md">
+              {currentRecs.map((meal: Record<string, unknown>, index: number) => (
+                <Card key={index} className="rounded-xl overflow-hidden border-0 ring-1 ring-slate-100 dark:ring-white/5 shadow-md">
                   <div className="p-4 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{meal.meal_name}</h3>
+                      <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">{meal.meal_name as string}</h3>
                       <span className="text-xs text-slate-500 flex items-center gap-1 shrink-0 mt-1">
-                        <Clock size={12} /> {new Date(meal.created_at).toLocaleDateString()}
+                        <Clock size={12} /> {new Date(meal.created_at as string).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="text-xs font-medium text-primary mb-3">
-                      {meal.meal_nutrition?.calories} kcal
+                      {(meal.meal_nutrition as any)?.calories} kcal
                     </div>
-                    {meal.meal_nutrition?.advice ? (
+                    {(meal.meal_nutrition as any)?.advice ? (
                       <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex-1 italic border-l-2 border-primary pl-3">
-                        "{meal.meal_nutrition.advice}"
+                        &quot;{(meal.meal_nutrition as any).advice}&quot;
                       </p>
                     ) : (
                       <p className="text-sm text-slate-400 italic flex-1 border-l-2 border-slate-300 dark:border-slate-700 pl-3">

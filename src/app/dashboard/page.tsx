@@ -167,8 +167,8 @@ export default function DashboardPage() {
       >
         <motion.header variants={item} className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Today's Overview</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Here's your nutritional summary for today</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Today&apos;s Overview</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Here&apos;s your nutritional summary for today</p>
           </div>
 
         </motion.header>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
             <CardContent>
               {recentMeals.length > 0 ? (
                 <div className="space-y-4">
-                  {recentMeals.slice(0, 5).map((meal: any) => (
+                  {recentMeals.slice(0, 5).map((meal: Record<string, unknown> | any) => (
                     <div key={meal.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-border/50 bg-slate-50 dark:bg-slate-900/50">
                       <div className="flex items-center gap-3 overflow-hidden">
                         <MealImage url={meal.image_url} name={meal.meal_name} />
