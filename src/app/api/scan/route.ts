@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { getGeminiClient } from '@/lib/gemini';
-import { writeFile, mkdir, readdir, stat, unlink } from 'fs/promises';
-import { join } from 'path';
-import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -23,28 +20,11 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes); // For Gemini AI & Storage
 
-    // Save image to public/uploads
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-
-      // Cleanup files older than 30 days
-      const files = await readdir(uploadsDir);
-      const now = Date.now();
-      const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-      for (const f of files) {
-        const fp = join(uploadsDir, f);
-        const stats = await stat(fp);
-        if (now - stats.mtimeMs > thirtyDays) {
-          await unlink(fp).catch(() => { });
-        }
-      }
-    } catch (_) { }
-
-    const filename = `${crypto.randomUUID()}-${file.name}`;
-    const filepath = join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
-    const imageUrl = `/uploads/${filename}`;
+    // Vercel serverless functions have a read-only filesystem (EROFS error).
+    // Karena kita sudah mengkompres gambar di sisi klien menjadi sangat kecil (< 50KB),
+    // kita bisa langsung menyimpannya sebagai Base64 string di database PostgreSQL (MVP solution).
+    // Untuk versi production skala besar, sangat disarankan menggunakan Supabase Storage atau AWS S3.
+    const imageUrl = `data:${file.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
 
     // Get user profile to customize advice
     const userProfile = await prisma.profile.findUnique({
@@ -125,8 +105,12 @@ export async function POST(request: Request) {
     });
 
     // Update daily summary
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Fix timezone issue on Vercel (UTC) vs Local (UTC+7)
+    const now = new Date();
+    const offset = 7 * 60 * 60 * 1000; // Jakarta UTC+7
+    const localNow = new Date(now.getTime() + offset);
+    localNow.setUTCHours(0, 0, 0, 0);
+    const today = new Date(localNow.getTime() - offset);
 
     const existingSummary = await prisma.dailySummary.findUnique({
       where: {

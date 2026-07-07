@@ -11,8 +11,12 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Fix timezone issue on Vercel (UTC) vs Local (UTC+7)
+    const now = new Date();
+    const offset = 7 * 60 * 60 * 1000; // Jakarta UTC+7
+    const localNow = new Date(now.getTime() + offset);
+    localNow.setUTCHours(0, 0, 0, 0);
+    const today = new Date(localNow.getTime() - offset);
 
     const [dailySummary, profile, recentMeals] = await Promise.all([
       prisma.dailySummary.findUnique({
@@ -35,15 +39,11 @@ export async function GET() {
     ]);
 
     const safeRecentMeals = recentMeals?.map(meal => {
-      let image_url = meal.image_url;
-      if (image_url) {
-        const relativePath = image_url.startsWith('/') ? image_url.substring(1) : image_url;
-        const fullPath = join(process.cwd(), 'public', relativePath);
-        if (!existsSync(fullPath)) {
-          image_url = '';
-        }
-      }
-      return { ...meal, image_url };
+      // Return the meal as is. 
+      // Do not use fs.existsSync because:
+      // 1. It crashes when image_url is a long base64 string (ENAMETOOLONG).
+      // 2. Vercel serverless doesn't persist files locally anyway.
+      return { ...meal };
     });
 
     return NextResponse.json({
