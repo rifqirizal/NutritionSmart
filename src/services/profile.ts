@@ -2,7 +2,13 @@ import { useQuery, useMutation, UseQueryOptions } from '@tanstack/react-query';
 import { ProfileInput } from '@/validators/profile';
 
 export async function getProfile() {
-  const res = await fetch('/api/profile');
+  const res = await fetch('/api/profile', {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
+  });
   return res.json();
 }
 

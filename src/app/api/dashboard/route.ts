@@ -32,7 +32,13 @@ export async function GET() {
       }),
       prisma.meal.findMany({
         where: { user_id: session.userId },
-        include: { meal_nutrition: true },
+        select: {
+          id: true,
+          user_id: true,
+          meal_name: true,
+          created_at: true,
+          meal_nutrition: true,
+        },
         orderBy: { created_at: 'desc' },
         take: 6,
       }),

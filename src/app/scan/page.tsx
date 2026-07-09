@@ -153,7 +153,7 @@ export default function ScanPage() {
       } else {
         setResult(data.data);
         toast.success('Food analyzed successfully!');
-        queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
+        queryClient.removeQueries({ queryKey: ['dashboardData'] });
       }
     } catch (err) {
       toast.error('An error occurred during scanning. Make sure GEMINI_API_KEY is configured.');

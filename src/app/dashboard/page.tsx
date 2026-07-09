@@ -271,7 +271,7 @@ export default function DashboardPage() {
                   {recentMeals.slice(0, 5).map((meal: Record<string, unknown> | any) => (
                     <div key={meal.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-border/50 bg-slate-50 dark:bg-slate-900/50">
                       <div className="flex items-center gap-3 overflow-hidden">
-                        <MealImage url={meal.image_url} name={meal.meal_name} />
+                        <MealImage url={`/api/meals/${meal.id}/image`} name={meal.meal_name} />
                         <div className="truncate">
                           <p className="font-semibold text-slate-900 dark:text-white truncate">{meal.meal_name}</p>
                           <p className="text-xs text-slate-500">

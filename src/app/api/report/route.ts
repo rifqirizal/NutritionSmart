@@ -41,7 +41,11 @@ export async function GET(req: NextRequest) {
       orderBy: {
         created_at: 'desc',
       },
-      include: {
+      select: {
+        id: true,
+        user_id: true,
+        meal_name: true,
+        created_at: true,
         meal_nutrition: true,
       }
     });
