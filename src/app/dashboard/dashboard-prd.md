@@ -12,6 +12,7 @@ Menampilkan ringkasan nutrisi harian pengguna secara *real-time* dan memantau pe
 
 ## Acceptance Criteria
 - [x] Data *real-time* tersinkronisasi (menggunakan React Query dengan `refetchInterval` 5 menit dan `staleTime: 0`).
+- [x] Cache dashboard wajib di-invalidate (`queryClient.invalidateQueries`) setelah ada update profil atau penambahan makanan baru via *scan*.
 - [x] Progress target tampil akurat dengan visual progress bar.
 - [x] Menghindari bug *timezone drift* antara lokal dan server (perhitungan *midnight* dikunci ke UTC+7 Jakarta).
 - [x] Tanggal dan jam tampil rapi di daftar *Recent Meals*.

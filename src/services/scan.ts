@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export async function scanFoodImage(formData: FormData) {
   const res = await fetch('/api/scan', {
@@ -9,7 +9,11 @@ export async function scanFoodImage(formData: FormData) {
 }
 
 export function useScanFood() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: scanFoodImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
+    },
   });
 }

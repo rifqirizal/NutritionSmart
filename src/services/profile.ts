@@ -1,4 +1,4 @@
-import { useQuery, useMutation, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, UseQueryOptions, useQueryClient } from '@tanstack/react-query';
 import { ProfileInput } from '@/validators/profile';
 
 export async function getProfile() {
@@ -30,7 +30,12 @@ export async function updateProfile(data: ProfileInput) {
 }
 
 export function useUpdateProfile() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
+    },
   });
 }
